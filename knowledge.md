@@ -79,13 +79,55 @@ npm install core-js@3 --save
 - `useBuiltIns:entry`：可以在入口文件直接引入[提案polyfill](https://github.com/zloirock/core-js/tree/master/packages/core-js/proposals)，比如：`import "core-js/proposals/string-replace-all"`
 - `useBuiltIns:usage`：需要将`proposals`设置为`true`，即：`{ version: 2 | 3, proposals: true }`
 
+# eslint配置
+
+## 配置文件
+
+eslint有两种使用配置文件的方式：
+
+- 第一种方式通过使用`.eslintrc.*`或`package.json`配置文件。eslint将自动从待检测文件所在目录开始，逐级向上查找父目录，直到根目录或者指定了`root:true`的配置文件
+- 第二种方式通过命令行，将配置文件路径直接传递给`CLI`，例如：
+
+```bash
+eslint -c myconfig.json myfiletotest.js
+```
+
+### 优先级
+
+假设有如下目录结构：
+
+```
+your-project
+├── .eslintrc
+├── lib
+│ └── source.js
+└─┬ tests
+  ├── .eslintrc
+  └── test.js
+```
+
+在`/lib`目录下的文件将使用项目根目录的`.eslintrc`，当遍历到`tests`目录时，它下面的文件除了使用根目录的`.eslintrc`外，还将使用`tests`目录下自身的`.eslintrc`,
+最终的配置项是二者的组合，并且最靠近待检测文件的`.eslintrc`优先
+
+假如同层目录下有多个配置文件，它们的优先级依次如下：
+
+1. .eslintrc.js
+2. .eslintrc.cjs
+3. .eslintrc.yaml
+4. .eslintrc.yml
+5. .eslintrc.json
+6. .eslintrc
+7. package.json
+
+前面的优先级的文件一旦使用，后面的文件将被忽略
+
 # webpack配置
 
 ## resolve
 
 `resolve`用于设置webpack如何解析模块
 
-```js
+```
 {
     resolve: {
         modules: ['node_modules'], // 指定webpack从哪个目录解析模块

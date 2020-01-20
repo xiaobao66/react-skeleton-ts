@@ -28,15 +28,15 @@ module.exports = {
   devtool: isDebug ? 'inline-source-map' : false,
 
   entry: {
-    app: [
-      './src/index.js',
-    ],
+    app: ['./src/index.js'],
   },
 
   output: {
     path: BUILD_DIR,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
-    chunckFilename: isDebug ? 'chunks/[name].js' : 'chunks/[name].[chunkhash:8].js',
+    chunkFilename: isDebug
+      ? 'chunks/[name].js'
+      : 'chunks/[name].[chunkhash:8].js',
     publicPath: '/',
   },
 
