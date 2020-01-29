@@ -38,7 +38,7 @@ module.exports = {
     app: [
       ...(isDebug
         ? [
-            'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=2000&reload=false',
+            'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=10000&reload=true',
           ]
         : []),
       './src/index.js',

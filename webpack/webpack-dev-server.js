@@ -45,7 +45,11 @@ app.use(
     SERVER_CONFIG.devMiddlewareOptions,
   ),
 );
-app.use(require('webpack-hot-middleware')(compiler));
+app.use(
+  require('webpack-hot-middleware')(compiler, {
+    heartbeat: 5000, // 一定要设置心跳时间，并且心跳时间必须小于设置的timeout，否则会导致控制台输出 [HMR] connected 两次
+  }),
+);
 
 // 寻找可用端口
 portfinder
