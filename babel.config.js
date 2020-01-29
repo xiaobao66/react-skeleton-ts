@@ -9,8 +9,8 @@ module.exports = api => {
       [
         '@babel/preset-env',
         {
-          target: {
-            browserlist: pkg.browserlist,
+          targets: {
+            browsers: pkg.browserlist,
           },
           modules: false, // use webpack trans es6 module with tree-shaking
           forceAllTransforms: !isDebug, // for UglifyJS
@@ -24,6 +24,7 @@ module.exports = api => {
     plugins: [
       '@babel/plugin-syntax-dynamic-import',
       '@babel/plugin-proposal-class-properties',
+      ...(isDebug ? ['dva-hmr'] : []),
     ],
   };
 

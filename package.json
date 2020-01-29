@@ -9,7 +9,8 @@
     "not ie < 9"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node webpack/webpack-dev-server.js",
+    "build": "webpack --config  webpack/webpack.config.js --release"
   },
   "author": "xiaobaowei",
   "license": "ISC",
@@ -21,6 +22,10 @@
     "@babel/preset-react": "^7.7.4",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
+    "babel-plugin-dva-hmr": "^0.4.2",
+    "clean-webpack-plugin": "^3.0.0",
+    "connect-history-api-fallback": "^1.6.0",
+    "copy-webpack-plugin": "^5.1.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.7.0",
@@ -29,15 +34,29 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.18.0",
     "eslint-plugin-react-hooks": "^1.7.0",
+    "express": "^4.17.1",
+    "html-webpack-plugin": "^3.2.0",
+    "portfinder": "^1.0.25",
     "prettier": "^1.19.1",
+    "redbox-react": "^1.6.0",
     "stylelint": "^13.0.0",
     "stylelint-config-standard": "^19.0.0",
     "stylelint-order": "^4.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-hot-middleware": "^2.25.0",
     "yargs": "^15.0.2"
   },
   "dependencies": {
-    "core-js": "^3.4.5"
+    "core-js": "^3.4.5",
+    "dva": "^2.4.1",
+    "dva-loading": "^3.0.20",
+    "dva-model-extend": "^0.1.2",
+    "history": "^4.10.1",
+    "prop-types": "^15.7.2",
+    "qs": "^6.9.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   }
 }

@@ -12,6 +12,10 @@ module.exports = {
     },
   },
 
+  globals: {
+    __DEV__: true,
+  },
+
   env: {
     browser: true,
     es6: true,
@@ -35,6 +39,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'prettier/prettier': 'error',
     'import/no-extraneous-dependencies': ['error', { packageDir: '.' }],
+    'import/prefer-default-export': 'off',
     'no-console': [
       'error',
       {
@@ -69,6 +74,7 @@ module.exports = {
     'react/prefer-stateless-function': 'off',
     'react/forbid-prop-types': 'off',
     'react/destructuring-assignment': 'off',
+    'react/require-default-props': 'off',
   },
 
   settings: {
