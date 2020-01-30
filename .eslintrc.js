@@ -40,6 +40,7 @@ module.exports = {
     'prettier/prettier': 'error',
     'import/no-extraneous-dependencies': ['error', { packageDir: '.' }],
     'import/prefer-default-export': 'off',
+    'import/no-dynamic-require': 'off',
     'no-console': [
       'error',
       {
@@ -62,6 +63,7 @@ module.exports = {
         enforceForRenamedProperties: false,
       },
     ],
+    'global-require': 'off',
     'jsx-a11y/anchor-is-valid': [
       'error',
       {

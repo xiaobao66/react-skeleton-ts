@@ -1,6 +1,8 @@
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -99,7 +101,32 @@ module.exports = {
       },
     }),
     ...(isDebug
-      ? [new webpack.HotModuleReplacementPlugin()]
+      ? [
+          // 如果使用了dll才注入相应文件
+          ...(fs.existsSync(resolvePath('node_modules/react-skeleton/dll'))
+            ? [
+                new webpack.DllReferencePlugin({
+                  // 链接dll
+                  manifest: require(resolvePath(
+                    'node_modules/react-skeleton/dll',
+                    'dependencies.manifest.json',
+                  )),
+                }),
+                new CopyWebpackPlugin([
+                  {
+                    from: resolvePath('node_modules/react-skeleton/dll'),
+                    to: 'dll', // 相对于output
+                  },
+                ]),
+                new HtmlWebpackTagsPlugin({
+                  // 将dll库文件插入到html中，需要放在HtmlWebpackTagsPlugin之后
+                  append: false,
+                  scripts: ['dll/dependencies.dll.js'],
+                }),
+              ]
+            : []),
+          new webpack.HotModuleReplacementPlugin(),
+        ]
       : [new CleanWebpackPlugin()]),
   ],
 };

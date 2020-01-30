@@ -145,3 +145,95 @@ your-project
 
 - 绝对路径：只在指定的目录查找文件
 - 相对路径：会从当前目录开始，依次查找其父级目录，直到找到文件为止
+
+## output
+
+output用于配置webpack如何生成编译文件，如：资源文件、js脚本等
+
+### output.library
+
+`string|object`
+
+当使用webpack编译类库时用到，用于指定类库的命名空间(`namespace`)，具体的导出形式由`output.libraryTarget`决定
+
+```
+module.exports = {
+  //...
+  output: {
+    library: 'MyLibrary'
+  }
+};
+```
+
+### output.libraryTarget
+
+`string`
+
+定义了类库以什么方式导出(`expose`)，默认值是`var`，主要的形式有以下几种：
+(以下所有示例，假定`output.library`设置为`MyLib`，`entry`入口文件编译后的结果为`_entry_return_`)
+
+- `var`
+
+编译后的结果将赋值给一个全局变量，变量名为`output.library`设置的
+
+```
+var MyLib = _entry_return_
+```
+
+- `this`
+
+`output.library`将作为`this`下的一个`key`，用来接收编译结果
+
+```
+this['MyLib`] = _entry_return_
+```
+
+- `window`
+
+`output.library`将作为`window`对象下的一个`key`，用来接收编译结果
+
+```
+window['MyLib`] = _entry_return_
+```
+
+- `global`
+
+`output.library`将作为`global`对象下的一个`key`，用来接收编译结果
+
+```
+global['MyLib`] = _entry_return_
+```
+
+- `umd`
+
+将编译后的结果以通用模块的形式导出，让其能够在`CommonJs`、`AMD`、`global variable`环境下使用
+
+配置:
+
+```
+module.exports = {
+  //...
+  output: {
+    library: 'MyLibrary',
+    libraryTarget: 'umd'
+  }
+};
+```
+
+
+输出结果:
+
+```
+(function webpackUniversalModuleDefinition(root, factory) {
+  if(typeof exports === 'object' && typeof module === 'object')
+    module.exports = factory();
+  else if(typeof define === 'function' && define.amd)
+    define([], factory);
+  else if(typeof exports === 'object')
+    exports['MyLibrary'] = factory();
+  else
+    root['MyLibrary'] = factory();
+})(typeof self !== 'undefined' ? self : this, function() {
+  return _entry_return_;
+});
+```
