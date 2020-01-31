@@ -21,7 +21,7 @@ const SERVER_CONFIG = {
       chunkModules: false,
       colors: true,
       hash: false,
-      modules: true,
+      modules: false,
       reasons: true,
       timings: true,
       version: false,
