@@ -21,12 +21,12 @@ const SERVER_CONFIG = {
       chunkModules: false,
       colors: true,
       hash: false,
-      modules: false,
+      modules: true,
       reasons: true,
       timings: true,
       version: false,
     },
-    writeToDisk: false,
+    writeToDisk: false, // 编译结果是否写入硬盘
   },
 };
 

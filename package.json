@@ -9,6 +9,7 @@
     "not ie < 9"
   ],
   "scripts": {
+    "start": "npm run dll && npm run dev",
     "dev": "node webpack/webpack-dev-server.js",
     "build": "webpack --config  webpack/webpack.config.js --release",
     "dll": "webpack --config webpack/webpack.dll.config.js --mode development"

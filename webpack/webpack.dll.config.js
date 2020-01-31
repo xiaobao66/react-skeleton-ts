@@ -1,14 +1,13 @@
 const webpack = require('webpack');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const packageJson = require('../package.json');
 
 const ROOT_DIR = path.resolve(__dirname, '../');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 
 module.exports = {
   entry: {
-    dependencies: Object.keys(packageJson.dependencies),
+    dependencies: Object.keys(require('../package.json').dependencies),
   },
 
   output: {

@@ -237,3 +237,120 @@ module.exports = {
   return _entry_return_;
 });
 ```
+
+## DllPlugin
+
+动态链接库，使用`DllPlugin`和`DllReferencePlugin`将打包文件中的公共资源进行分离，提高编译速度
+
+使用过程分为以下两步：`构建dll库`和`引用dll库`
+
+I. 构建dll库
+
+a. 定义一个用于打包dll库的webpack配置文件(如：`webpack.dll.config.js`)，使用插件`DllPlugin`输出`manifest.json`映射文件
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: {
+    dependencies: ['react', 'react-dom'], // 需要打包成dll库的文件
+  },
+
+  output: {
+    path: path.join(__dirname, 'dist', 'dll'),
+    filename: '[name].dll.js',
+    library: '_dll_[name]_[hash]',
+    libraryTarget: 'var',
+  },
+
+  plugins: [
+    new webpack.DllPlugin({
+      context: __dirname, // manifest缓存文件的请求上下文
+      path: path.join(__dirname, 'dist', 'dll/[name].manifest.json'), // manifest.json文件输出位置
+      name: '_dll_[name]_[hash]', // 和library设置的一致，输出的manifest.json中的name值
+    }),
+  ],
+};
+```
+
+构建完成后将得到两个文件：`dependencies.dll.js`和`dependencies.manifest.json`
+
+- `dependencies.dll.js`：构建后的dll库文件
+- `dependencies.manifest.json`：库映射文件
+
+b. 在`package.json`里新增构建dll的命令
+
+```
+{
+    "scripts": {
+        "dll": "webpack --config webpack.dll.config.js --mode production"
+    }
+}
+```
+
+II. 引用dll库
+
+a. 配置项目webpack主配置文件，如：`webpack.config.js`，需要使用`DllReferencePlugin`插件
+
+```js
+const webpack = require('webpack');
+
+module.exports = {
+  // ...其他webpack配置
+  plugins: [
+    new webpack.DllReferencePlugin({
+      context: __dirname, // 这个context必须和DllPlugin的保持一致，否则dll库无法链接
+      manifest: require(path.join(__dirname, 'dist', 'dll/[name].manifest.json')), // dll编译生成的manifest文件
+    }),
+  ]
+};
+```
+
+b. 在项目html模板中注入`dependencies.dll.js`
+
+```html
+<script src="/dll/dependencies.dll.js"></script>
+```
+
+但是手动注入的方式既繁琐又易错，为了减少构建过程中的人工干预，降低出错可能，决定使用`html-webpack-tags-plugin`插件实现自动注入dll文件
+
+具体来说，就是在webpack配置中增加如下内容：
+
+```js
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
+
+module.exports = {
+  plugins: [
+    // ...其他配置
+    new HtmlWebpackTagsPlugin({
+      // 将dll库文件插入到html中，需要放在HtmlWebpackTagsPlugin之后
+      append: false,
+      scripts: ['dll/dependencies.dll.js'],
+    }),
+  ],
+};               
+```
+
+完整配置如下：
+
+```js
+const webpack = require('webpack');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
+
+module.exports = {
+  // ...其他webpack配置
+  plugins: [
+    new webpack.DllReferencePlugin({
+      context: __dirname, // 这个context必须和DllPlugin的保持一致，否则dll库无法链接
+      manifest: require(path.join(__dirname, 'dist', 'dll/[name].manifest.json')), // dll编译过程生成的manifest文件
+    }),
+    new HtmlWebpackTagsPlugin({
+      // 将dll库文件插入到html中，需要放在HtmlWebpackTagsPlugin之后
+      append: false, // 插入在其他webpack生成的bundle文件前
+      scripts: ['dll/dependencies.dll.js'],
+    }), 
+  ]
+};
+```
+
+以上就实现了dll动态链接库功能
