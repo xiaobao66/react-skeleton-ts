@@ -41,6 +41,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { packageDir: '.' }],
     'import/prefer-default-export': 'off',
     'import/no-dynamic-require': 'off',
+    'import/no-unresolved':['error', {ignore: ['\\?local$']}],
     'no-console': [
       'error',
       {

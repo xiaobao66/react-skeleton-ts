@@ -238,6 +238,60 @@ module.exports = {
 });
 ```
 
+## module
+
+该配置决定webpack如何处理指定类型的模块
+
+### module.rules
+
+`[Rule]`
+
+该选项用于设置指定类型的模块以何种方式进行处理，值类型是一个包含`Rule`对象的数组
+
+#### Rule
+
+`object`
+
+具体的模块规则，每条规则由三部分组成：`条件(conditions)`、`结果(results)`和`嵌套规则(nested rules)`
+
+##### Rule Conditions
+
+条件有两种输入形式：
+
+- resource：请求文件的绝对路径，它已经过`resolve`规则解析
+- issuer：发出资源请求的模块的绝对路径，是导入时的位置
+
+> 例如：在`app.js`中`import './style.css'`，`resource`指的是`/path/to/style.css`，而`issuer`指的是`/path/to/app.js`
+
+在Rule的属性中，`test`、`include`、`exclude`和`resource`属性匹配`resource`规则；`issuer`属性匹配`issuer`规则
+
+##### Rule Results
+
+只有当条件匹配了结果才会生效
+
+结果有两种输出形式：
+
+- 应用的`loaders`：应用在资源上的loader数组
+- parser选项：用于设置该模块的解析器规则
+
+与`loaders`相关的属性：`loader`、`options`和`use`，也兼容`query`和`loaders`
+
+`enforce`属性会影响`loader`的种类，不论它是普通loader、前置loader还是后置loader
+
+与`parser`相关的属性：`parser`
+
+##### Nested Rules
+
+嵌套规则可用于细化父规则，它们可以包含自己的条件。只有当父规则匹配，嵌套规则才生效。
+
+可以通过`rules`和`oneOf`两个属性来设置嵌套规则
+
+规则的优先级如下：
+
+1. 父规则
+2. `rules`
+3. `oneOf`
+
 ## DllPlugin
 
 动态链接库，使用`DllPlugin`和`DllReferencePlugin`将打包文件中的公共资源进行分离，提高编译速度

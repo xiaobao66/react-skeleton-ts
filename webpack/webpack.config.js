@@ -5,12 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 const SRC_DIR = resolvePath('src');
 const BUILD_DIR = resolvePath('build');
 const PUBLIC_DIR = resolvePath('public');
+const CONFIG_DIR = resolvePath('webpack');
 
 // 获取命令行参数
 const { argv } = require('yargs')
@@ -67,7 +69,92 @@ module.exports = {
       {
         test: /\.jsx?$/,
         include: [SRC_DIR],
-        loader: 'babel-loader',
+        use: [{ loader: 'babel-loader' }],
+      },
+      {
+        test: /\.(css|less|scss)$/,
+        rules: [
+          {
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  hmr: isDebug,
+                  // reloadAll: isDebug, // 如果hmr使用不正确才启用
+                },
+              },
+            ],
+          },
+          {
+            oneOf: [
+              {
+                resourceQuery: /local/,
+                use: [
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      sourceMap: isDebug,
+                      modules: {
+                        mode: 'local',
+                        localIdentName: isDebug
+                          ? '[path][name]__[local]'
+                          : '[hash:base64:5]',
+                      },
+                      importLoaders: 1,
+                    },
+                  },
+                ],
+              },
+              {
+                use: [
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      sourceMap: isDebug,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            use: [
+              {
+                loader: 'postcss-loader',
+                options: {
+                  config: {
+                    path: CONFIG_DIR,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            test: /\.less$/,
+            use: [
+              {
+                loader: 'less-loader',
+                options: {
+                  sourceMap: true,
+                },
+              },
+            ],
+          },
+          {
+            test: /\.scss$/,
+            use: [
+              {
+                loader: 'resolve-url-loader',
+              },
+              {
+                loader: 'sass-loader',
+                options: {
+                  sourceMap: true,
+                },
+              },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -85,7 +172,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
-      title: 'react-base',
+      title: 'react-skeleton',
       templateParameters: (compilation, assets, options) => {
         // v3版本这样写，升级到v4版本就需要进行变更
         return {
@@ -99,6 +186,13 @@ module.exports = {
           __DEV__: isDebug,
         };
       },
+    }),
+    new MiniCssExtractPlugin({
+      filename: isDebug ? '[name].css' : '[name].[contenthash].css',
+      chunkFilename: isDebug
+        ? 'chunks/[id].css'
+        : 'chunks/[id].[contenthash].css',
+      ignoreOrder: true, // 去除css使用顺序冲突
     }),
     ...(isDebug
       ? [
