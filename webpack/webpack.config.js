@@ -29,7 +29,12 @@ const alias = {
   config: path.join(SRC_DIR, 'config'),
   models: path.join(SRC_DIR, 'models'),
   pages: path.join(SRC_DIR, 'pages'),
+  assets: path.join(SRC_DIR, 'assets'),
 };
+
+const staticAssetName = isDebug ? '[name].[ext]?[hash:8]' : '[hash:8].[ext]';
+const staticImagePath = 'images';
+const staticFontPath = 'fonts';
 
 module.exports = {
   context: ROOT_DIR,
@@ -73,6 +78,8 @@ module.exports = {
       },
       {
         test: /\.(css|less|scss)$/,
+        // 内嵌rules需要注意放置顺序
+        // 匹配时，从下到上逐条匹配，遇到匹配的就会执行，并且不中断匹配过程，直到第一条规则匹配完毕
         rules: [
           {
             use: [
@@ -153,6 +160,66 @@ module.exports = {
                 },
               },
             ],
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        // oneOf配置需要注意规则放置顺序
+        // 匹配时，从上到下逐条规则进行匹配，先匹配到的生效，无视后续规则，即使后面的规则也能匹配
+        oneOf: [
+          {
+            issuer: /\.(css|less|scss)$/,
+            oneOf: [
+              {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                use: [
+                  {
+                    loader: 'svg-url-loader',
+                    options: {
+                      limit: 4096, // 4kb
+                      name: staticAssetName,
+                      outputPath: staticImagePath,
+                    },
+                  },
+                ],
+              },
+              {
+                use: [
+                  {
+                    loader: 'url-loader',
+                    options: {
+                      limit: 4096, // 4kb
+                      name: staticAssetName,
+                      outputPath: staticImagePath,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: staticAssetName,
+                  outputPath: staticImagePath,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      {
+        test: /\.(ttf|otf|woff(2)?|eot)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: staticAssetName,
+              outputPath: staticFontPath,
+            },
           },
         ],
       },
