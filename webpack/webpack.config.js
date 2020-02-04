@@ -69,6 +69,27 @@ module.exports = {
     alias,
   },
 
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        // 抽取node_modules中的js模块
+        vendors: {
+          name: 'vendors',
+          // Note the usage of `[\\/]` as a path separator for cross-platform compatibility
+          test: /[\\/]node_modules[\\/].*\.js$/,
+          chunks: 'all',
+        },
+        // 将样式文件打包到一起
+        styles: {
+          name: 'styles',
+          test: /\.(css|less|scss)$/,
+          chunks: 'all',
+          enforce: true, // 忽略chunks的一些限制条件(比如：minSize、minChunks)，强制抽取
+        },
+      },
+    },
+  },
+
   module: {
     rules: [
       {

@@ -408,3 +408,93 @@ module.exports = {
 ```
 
 以上就实现了dll动态链接库功能
+
+## optimization
+
+### splitChunks
+
+抽取公共代码，减少bundle大小
+
+默认的`splitChunks`配置只对按需加载的chunk生效，因为修改初始加载的chunk会影响HTML文件里引用的script标签
+
+webpack默认将按照下述的条件进行模块拆分：
+
+- 新生成的chunk被其他chunk引用，或者模块来自`node_modules`
+- 新生成的chunk要大于30kb
+- 按需加载的模块最大并行请求数<=6
+- 初始加载的模块最大并行请求数<=4
+
+完整的默认配置如下：
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      chunks: 'async',
+      minSize: 30000,
+      minRemainingSize: 0,
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 6,
+      maxInitialRequests: 4,
+      automaticNameDelimiter: '~',
+      automaticNameMaxLength: 30,
+      cacheGroups: {
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
+};
+```
+
+配置时，通过设置`cacheGroups`缓存组实现根据不同条件生成不同公共文件的需求
+
+#### splitChunks.cacheGroups
+
+`object`
+
+`cacheGroups`将会继承之前默认配置中，所以非`cacheGroups`的配置，并且可以根据自己的需要进行覆盖
+
+除了继承而来的配置外，每个`cacheGroup`还额外增加以下几个属性：
+
+- test
+- priority
+- enforce
+
+##### splitChunks.cacheGroups.{cacheGroup}.test
+
+`function (module, chunk) => boolean | RegExp | string`
+
+缓存组匹配条件，指定哪些模块将被此缓存组选中。省略将匹配所有模块，如果chunk的名称被命中，则chunk下所有的模块都被选中
+
+##### splitChunks.cacheGroups.{cacheGroup}.priority
+
+`number`
+
+缓存组权重，当模块匹配多个缓存组时，缓存组权重高的优先，自定义的缓存组默认权重为`0`，系统默认的缓存组权重为负值
+
+##### splitChunks.cacheGroups.{cacheGroup}.enforce
+
+`boolean = false`
+
+告知webpack是否忽略chunk的一些限制(`splitChunks.minSize`，`splitChunks.minChunks`，`splitChunks.maxAsyncRequests`和`splitChunks.maxInitialRequests`)，强制生成符合此缓存组的chunk
+
+#### splitChunks.chunks
+
+`string | function (chunk) => boolean`
+
+指示从哪种类型的模块中抽取公共代码，字符串值一共有三种类型：`initial`、`async`、`all`，
+
+- `initial`：初始模块，既在项目刚运行时就加载的模块
+- `async`：异步模块，区别于初始模块，即在项目运行过程中，按需加载的模块
+- `all`：全模块，包含上述提到的两种模块
+
