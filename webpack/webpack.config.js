@@ -6,6 +6,9 @@ const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// 分析构建结果
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -17,11 +20,17 @@ const CONFIG_DIR = resolvePath('webpack');
 // 获取命令行参数
 const { argv } = require('yargs')
   .boolean('release')
+  .boolean('analyze')
+  .boolean('verbose')
   .default({
     release: false,
+    analyze: false,
+    verbose: false,
   });
 
 const isDebug = !argv.release;
+const isAnalyze = argv.analyze;
+const isVerbose = argv.verbose;
 
 // alias
 const alias = {
@@ -77,7 +86,7 @@ module.exports = {
           name: 'vendors',
           // Note the usage of `[\\/]` as a path separator for cross-platform compatibility
           test: /[\\/]node_modules[\\/].*\.js$/,
-          chunks: 'all',
+          chunks: 'initial',
         },
         // 将样式文件打包到一起
         styles: {
@@ -276,12 +285,15 @@ module.exports = {
       },
     }),
     new MiniCssExtractPlugin({
-      filename: isDebug ? '[name].css' : '[name].[contenthash].css',
+      filename: isDebug ? '[name].css' : '[name].[contenthash:8].css',
       chunkFilename: isDebug
         ? 'chunks/[id].css'
-        : 'chunks/[id].[contenthash].css',
+        : 'chunks/[id].[contenthash:8].css',
       ignoreOrder: true, // 去除css使用顺序冲突
     }),
+    ...(isAnalyze
+      ? [new BundleAnalyzerPlugin(), new DuplicatePackageCheckerPlugin()]
+      : []),
     ...(isDebug
       ? [
           // 如果使用了dll才注入相应文件
@@ -311,4 +323,17 @@ module.exports = {
         ]
       : [new CleanWebpackPlugin()]),
   ],
+
+  stats: {
+    cached: false,
+    cachedAssets: false,
+    chunks: isVerbose,
+    chunkModules: isVerbose,
+    colors: true,
+    hash: isVerbose,
+    modules: isVerbose,
+    reasons: isDebug,
+    timings: true,
+    version: isVerbose,
+  },
 };
