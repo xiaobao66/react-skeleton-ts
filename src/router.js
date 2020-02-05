@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route, routerRedux } from 'dva/router';
 import dynamic from 'dva/dynamic';
+import 'themes/index.less';
 import 'assets/styles/index.scss';
 
 const { ConnectedRouter } = routerRedux;

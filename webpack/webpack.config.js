@@ -39,6 +39,7 @@ const alias = {
   models: path.join(SRC_DIR, 'models'),
   pages: path.join(SRC_DIR, 'pages'),
   assets: path.join(SRC_DIR, 'assets'),
+  themes: path.join(SRC_DIR, 'themes'),
 };
 
 const staticAssetName = isDebug ? '[name].[ext]?[hash:8]' : '[hash:8].[ext]';
@@ -174,7 +175,11 @@ module.exports = {
                 loader: 'less-loader',
                 options: {
                   sourceMap: true,
+                  javascriptEnabled: true,
                 },
+              },
+              {
+                loader: 'js-to-styles-var-loader-by-import',
               },
             ],
           },
@@ -189,6 +194,9 @@ module.exports = {
                 options: {
                   sourceMap: true,
                 },
+              },
+              {
+                loader: 'js-to-styles-var-loader-by-import',
               },
             ],
           },
