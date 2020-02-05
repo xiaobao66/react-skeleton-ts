@@ -76,6 +76,7 @@
     "dva-loading": "^3.0.20",
     "dva-model-extend": "^0.1.2",
     "history": "^4.10.1",
+    "normalize-scss": "^7.0.1",
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
     "react": "^16.12.0",

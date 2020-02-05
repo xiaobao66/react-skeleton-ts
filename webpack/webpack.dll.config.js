@@ -5,9 +5,14 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ROOT_DIR = path.resolve(__dirname, '../');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 
+// 排除dll的模块
+const excludeDlls = ['normalize-scss'];
+
 module.exports = {
   entry: {
-    dependencies: Object.keys(require('../package.json').dependencies),
+    dependencies: Object.keys(require('../package.json').dependencies).filter(
+      key => !excludeDlls.includes(key),
+    ),
   },
 
   output: {
