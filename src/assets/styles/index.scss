@@ -1,1 +1,5 @@
-@import '~normalize-scss/sass/normalize/_import-now.scss';
+@charset "UTF-8";
+
+// 引入自定义变量进行覆盖
+@import '~themes/vars.js';
+@import 'base/index';

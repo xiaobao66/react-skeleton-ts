@@ -179,7 +179,7 @@ module.exports = {
                 },
               },
               {
-                loader: 'js-to-styles-var-loader-by-import',
+                loader: '@xiaobaowei/js-to-styles-var-loader',
               },
             ],
           },
@@ -196,7 +196,7 @@ module.exports = {
                 },
               },
               {
-                loader: 'js-to-styles-var-loader-by-import',
+                loader: '@xiaobaowei/js-to-styles-var-loader',
               },
             ],
           },
