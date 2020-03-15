@@ -6,7 +6,7 @@ const ROOT_DIR = path.resolve(__dirname, '../');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 
 // 排除dll的模块
-const excludeDlls = [];
+const excludeDlls = ['@babel/runtime'];
 
 module.exports = {
   entry: {

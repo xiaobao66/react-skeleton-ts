@@ -10,7 +10,7 @@ module.exports = api => {
         '@babel/preset-env',
         {
           targets: {
-            browsers: pkg.browserlist,
+            browsers: pkg.browserslist,
           },
           modules: false, // use webpack trans es6 module with tree-shaking
           forceAllTransforms: !isDebug, // for UglifyJS
@@ -22,6 +22,7 @@ module.exports = api => {
       ['@babel/preset-react', { development: isDebug }],
     ],
     plugins: [
+      '@babel/plugin-transform-runtime',
       '@babel/plugin-syntax-dynamic-import',
       '@babel/plugin-proposal-class-properties',
       ['import', { libraryName: 'antd' }],
