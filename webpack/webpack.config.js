@@ -9,6 +9,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // 分析构建结果
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
+// 构建优化
+const threadLoader = require('thread-loader');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -42,9 +44,40 @@ const alias = {
   themes: path.join(SRC_DIR, 'themes'),
 };
 
-const staticAssetName = isDebug ? '[name].[ext]?[hash:8]' : '[hash:8].[ext]';
+const staticAssetName = isDebug
+  ? '[name].[ext]?[hash:8]'
+  : '[name].[hash:8].[ext]';
 const staticImagePath = 'images';
 const staticFontPath = 'fonts';
+
+// thread-loader
+let jsWorkerPool = {};
+let scssWorkerPool = {};
+if (!isDebug) {
+  const cpus = require('os').cpus().length;
+  let workers = Math.floor(cpus / 2);
+  if (workers <= 1) {
+    // workers数目不能过小
+    workers = cpus;
+  } else if (workers >= 4) {
+    // workers数目不宜过多，否则进程开销会抵消编译速度的提升
+    workers = 4;
+  }
+
+  jsWorkerPool = {
+    workers,
+  };
+  scssWorkerPool = {
+    workers,
+    workerParallelJobs: 2, // 限制sass-loader并发数，否则可能导致进程卡死 （https://medium.com/webpack/webpack-freelancing-log-book-week-15-30105e94ab51）
+  };
+
+  threadLoader.warmup(jsWorkerPool, ['babel-loader']);
+  threadLoader.warmup(scssWorkerPool, [
+    'sass-loader',
+    '@xiaobaowei/js-to-styles-var-loader',
+  ]);
+}
 
 module.exports = {
   context: ROOT_DIR,
@@ -105,7 +138,22 @@ module.exports = {
       {
         test: /\.jsx?$/,
         include: [SRC_DIR],
-        use: [{ loader: 'babel-loader' }],
+        use: [
+          ...(isDebug
+            ? []
+            : [
+                {
+                  loader: 'thread-loader',
+                  options: jsWorkerPool,
+                },
+              ]),
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: isDebug,
+            },
+          },
+        ],
       },
       {
         test: /\.(css|less|scss)$/,
@@ -189,6 +237,14 @@ module.exports = {
               {
                 loader: 'resolve-url-loader',
               },
+              ...(isDebug
+                ? []
+                : [
+                    {
+                      loader: 'thread-loader',
+                      options: scssWorkerPool,
+                    },
+                  ]),
               {
                 loader: 'sass-loader',
                 options: {
