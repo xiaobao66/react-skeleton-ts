@@ -19,6 +19,8 @@ const BUILD_DIR = resolvePath('build');
 const PUBLIC_DIR = resolvePath('public');
 const CONFIG_DIR = resolvePath('webpack');
 
+const REGEXP_THEME_NAME = /^themes\/(.+)/;
+
 // 获取命令行参数
 const { argv } = require('yargs')
   .boolean('release')
@@ -33,6 +35,17 @@ const { argv } = require('yargs')
 const isDebug = !argv.release;
 const isAnalyze = argv.analyze;
 const isVerbose = argv.verbose;
+
+// utils
+function recursiveIssuer(m) {
+  if (m.issuer) {
+    return recursiveIssuer(m.issuer);
+  }
+  if (m.name) {
+    return m.name;
+  }
+  return false;
+}
 
 // alias
 const alias = {
@@ -73,10 +86,7 @@ if (!isDebug) {
   };
 
   threadLoader.warmup(jsWorkerPool, ['babel-loader']);
-  threadLoader.warmup(scssWorkerPool, [
-    'sass-loader',
-    '@xiaobaowei/js-to-styles-var-loader',
-  ]);
+  threadLoader.warmup(scssWorkerPool, ['sass-loader']);
 }
 
 module.exports = {
@@ -95,11 +105,18 @@ module.exports = {
         : []),
       './src/index.js',
     ],
+    'themes/yellow': ['./src/themes/yellow.less'],
   },
 
   output: {
     path: BUILD_DIR,
-    filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
+    filename: ({ chunk }) => {
+      if (chunk.name.match(REGEXP_THEME_NAME)) {
+        return '[name].js';
+      }
+
+      return isDebug ? '[name].js' : '[name].[chunkhash:8].js';
+    },
     chunkFilename: isDebug
       ? 'chunks/[name].js'
       : 'chunks/[name].[chunkhash:8].js',
@@ -125,9 +142,25 @@ module.exports = {
         // 将样式文件打包到一起
         styles: {
           name: 'styles',
-          test: /\.(css|less|scss)$/,
+          test: (module, chunks, entry = 'app') => {
+            return (
+              module.constructor.name === 'CssModule' &&
+              recursiveIssuer(module) === entry
+            );
+          },
           chunks: 'all',
           enforce: true, // 忽略chunks的一些限制条件(比如：minSize、minChunks)，强制抽取
+        },
+        'themes/yellow': {
+          name: 'themes/yellow',
+          test: (module, chunks, entry = 'themes/yellow') => {
+            return (
+              module.constructor.name === 'CssModule' &&
+              recursiveIssuer(module) === entry
+            );
+          },
+          chunks: 'all',
+          enforce: true,
         },
       },
     },
@@ -226,9 +259,6 @@ module.exports = {
                   javascriptEnabled: true,
                 },
               },
-              {
-                loader: '@xiaobaowei/js-to-styles-var-loader',
-              },
             ],
           },
           {
@@ -250,9 +280,6 @@ module.exports = {
                 options: {
                   sourceMap: true,
                 },
-              },
-              {
-                loader: '@xiaobaowei/js-to-styles-var-loader',
               },
             ],
           },
@@ -335,6 +362,7 @@ module.exports = {
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
       title: 'react-skeleton',
+      excludeChunks: ['themes/yellow'],
       templateParameters: (compilation, assets, options) => {
         // v3版本这样写，升级到v4版本就需要进行变更
         return {
@@ -350,7 +378,13 @@ module.exports = {
       },
     }),
     new MiniCssExtractPlugin({
-      filename: isDebug ? '[name].css' : '[name].[contenthash:8].css',
+      moduleFilename: ({ name }) => {
+        if (name.match(REGEXP_THEME_NAME)) {
+          return '[name].css';
+        }
+
+        return isDebug ? '[name].css' : '[name].[contenthash:8].css';
+      },
       chunkFilename: isDebug
         ? 'chunks/[id].css'
         : 'chunks/[id].[contenthash:8].css',

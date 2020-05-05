@@ -1,3 +1,7 @@
 @import '~antd/dist/antd.less';
 // 利用less变量延迟加载的特性，实现变量覆盖
-@import 'vars.js';
+@primary-color: #1890ff;
+
+:root {
+  --primary-color: @primary-color;
+}
