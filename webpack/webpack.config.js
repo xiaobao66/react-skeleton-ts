@@ -11,6 +11,8 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 // 构建优化
 const threadLoader = require('thread-loader');
+// 主题配置文件
+const themeConfig = require('./theme.config')();
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -18,8 +20,6 @@ const SRC_DIR = resolvePath('src');
 const BUILD_DIR = resolvePath('build');
 const PUBLIC_DIR = resolvePath('public');
 const CONFIG_DIR = resolvePath('webpack');
-
-const REGEXP_THEME_NAME = /^themes\/(.+)/;
 
 // 获取命令行参数
 const { argv } = require('yargs')
@@ -35,17 +35,6 @@ const { argv } = require('yargs')
 const isDebug = !argv.release;
 const isAnalyze = argv.analyze;
 const isVerbose = argv.verbose;
-
-// utils
-function recursiveIssuer(m) {
-  if (m.issuer) {
-    return recursiveIssuer(m.issuer);
-  }
-  if (m.name) {
-    return m.name;
-  }
-  return false;
-}
 
 // alias
 const alias = {
@@ -105,13 +94,13 @@ module.exports = {
         : []),
       './src/index.js',
     ],
-    'themes/yellow': ['./src/themes/yellow.less'],
+    ...themeConfig.entries,
   },
 
   output: {
     path: BUILD_DIR,
     filename: ({ chunk }) => {
-      if (chunk.name.match(REGEXP_THEME_NAME)) {
+      if (chunk.name.match(themeConfig.REGEXP_THEME_NAME)) {
         return '[name].js';
       }
 
@@ -142,26 +131,16 @@ module.exports = {
         // 将样式文件打包到一起
         styles: {
           name: 'styles',
-          test: (module, chunks, entry = 'app') => {
+          test: (module, chunks) => {
             return (
               module.constructor.name === 'CssModule' &&
-              recursiveIssuer(module) === entry
+              themeConfig.recursiveIssuer(module) === 'app'
             );
           },
           chunks: 'all',
           enforce: true, // 忽略chunks的一些限制条件(比如：minSize、minChunks)，强制抽取
         },
-        'themes/yellow': {
-          name: 'themes/yellow',
-          test: (module, chunks, entry = 'themes/yellow') => {
-            return (
-              module.constructor.name === 'CssModule' &&
-              recursiveIssuer(module) === entry
-            );
-          },
-          chunks: 'all',
-          enforce: true,
-        },
+        ...themeConfig.cacheGroups,
       },
     },
   },
@@ -362,7 +341,7 @@ module.exports = {
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
       title: 'react-skeleton',
-      excludeChunks: ['themes/yellow'],
+      excludeChunks: Object.keys(themeConfig.entries),
       templateParameters: (compilation, assets, options) => {
         // v3版本这样写，升级到v4版本就需要进行变更
         return {
@@ -379,7 +358,7 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       moduleFilename: ({ name }) => {
-        if (name.match(REGEXP_THEME_NAME)) {
+        if (name.match(themeConfig.REGEXP_THEME_NAME)) {
           return '[name].css';
         }
 
