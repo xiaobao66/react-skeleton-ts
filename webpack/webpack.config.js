@@ -12,6 +12,7 @@ const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack
 // 构建优化
 const threadLoader = require('thread-loader');
 // 主题配置文件
+const MiniCssExtractPluginCleanup = require('./plugins/MiniCssExtractPluginCleanup');
 const themeConfig = require('./theme.config')();
 
 const ROOT_DIR = path.resolve(__dirname, '..');
@@ -379,6 +380,7 @@ module.exports = {
         : 'chunks/[id].[contenthash:8].css',
       ignoreOrder: true, // 去除css使用顺序冲突
     }),
+    new MiniCssExtractPluginCleanup(),
     ...(isAnalyze
       ? [new BundleAnalyzerPlugin(), new DuplicatePackageCheckerPlugin()]
       : []),
