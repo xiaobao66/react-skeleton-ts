@@ -21,6 +21,17 @@ const BUILD_DIR = resolvePath('build');
 const PUBLIC_DIR = resolvePath('public');
 const CONFIG_DIR = resolvePath('webpack');
 
+// utils
+function recursiveIssuer(m) {
+  if (m.issuer) {
+    return recursiveIssuer(m.issuer);
+  }
+  if (m.name) {
+    return m.name;
+  }
+  return false;
+}
+
 // 获取命令行参数
 const { argv } = require('yargs')
   .boolean('release')
@@ -131,16 +142,15 @@ module.exports = {
         // 将样式文件打包到一起
         styles: {
           name: 'styles',
-          test: (module, chunks) => {
+          test: module => {
             return (
               module.constructor.name === 'CssModule' &&
-              themeConfig.recursiveIssuer(module) === 'app'
+              recursiveIssuer(module) === 'app'
             );
           },
           chunks: 'all',
           enforce: true, // 忽略chunks的一些限制条件(比如：minSize、minChunks)，强制抽取
         },
-        ...themeConfig.cacheGroups,
       },
     },
   },
