@@ -11,9 +11,8 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
 // 构建优化
 const threadLoader = require('thread-loader');
-// 主题配置文件
-const MiniCssExtractPluginCleanup = require('./plugins/MiniCssExtractPluginCleanup');
-const themeConfig = require('./theme.config')();
+// 主题配置
+const ThemeConfigPlugin = require('./plugins/ThemeConfigPlugin');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -106,18 +105,11 @@ module.exports = {
         : []),
       './src/index.js',
     ],
-    ...themeConfig.entries,
   },
 
   output: {
     path: BUILD_DIR,
-    filename: ({ chunk }) => {
-      if (chunk.name.match(themeConfig.REGEXP_THEME_NAME)) {
-        return '[name].js';
-      }
-
-      return isDebug ? '[name].js' : '[name].[chunkhash:8].js';
-    },
+    filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDebug
       ? 'chunks/[name].js'
       : 'chunks/[name].[chunkhash:8].js',
@@ -352,7 +344,6 @@ module.exports = {
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
       title: 'react-skeleton',
-      excludeChunks: Object.keys(themeConfig.entries),
       templateParameters: (compilation, assets, options) => {
         // v3版本这样写，升级到v4版本就需要进行变更
         return {
@@ -368,19 +359,13 @@ module.exports = {
       },
     }),
     new MiniCssExtractPlugin({
-      moduleFilename: ({ name }) => {
-        if (name.match(themeConfig.REGEXP_THEME_NAME)) {
-          return '[name].css';
-        }
-
-        return isDebug ? '[name].css' : '[name].[contenthash:8].css';
-      },
+      filename: isDebug ? '[name].css' : '[name].[contenthash:8].css',
       chunkFilename: isDebug
         ? 'chunks/[id].css'
         : 'chunks/[id].[contenthash:8].css',
       ignoreOrder: true, // 去除css使用顺序冲突
     }),
-    new MiniCssExtractPluginCleanup(),
+    new ThemeConfigPlugin(),
     ...(isAnalyze
       ? [new BundleAnalyzerPlugin(), new DuplicatePackageCheckerPlugin()]
       : []),
