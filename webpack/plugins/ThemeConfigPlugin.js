@@ -7,7 +7,7 @@ class ThemeConfigPlugin {
     this.options = {
       themeDir:
         options.themeDir || path.resolve(__dirname, '../..', './src/themes'),
-      exclude: options.exclude || ['default.less'],
+      exclude: options.exclude || ['base.less', 'default.less'],
       namespace: options.namespace || 'themes',
     };
   }
@@ -56,15 +56,17 @@ class ThemeConfigPlugin {
       (compilation, callback) => {
         Object.keys(compilation.assets)
           .filter(asset => {
-            return /^themes\/(.+)\.(js|css)$/.test(asset);
+            return new RegExp(`^${namespace}\\/(.+)\\.(js|css)$`).test(asset);
           })
           .forEach(asset => {
-            const REGEXP_CSS_NAME = /^themes\/(\w+)(\..+)?\.css$/;
+            const REGEXP_CSS_NAME = new RegExp(
+              `^${namespace}\\/(\\w+)(\\..+)?\\.css$`,
+            );
             const match = asset.match(REGEXP_CSS_NAME);
 
             if (match) {
               const [, name] = match;
-              compilation.assets[`themes/${name}.css`] =
+              compilation.assets[`${namespace}/${name}.css`] =
                 compilation.assets[asset];
             }
 
