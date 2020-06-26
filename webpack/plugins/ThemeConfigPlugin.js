@@ -5,29 +5,25 @@ const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 class ThemeConfigPlugin {
   constructor(options = {}) {
     this.options = {
-      themeDir:
-        options.themeDir || path.resolve(__dirname, '../..', './src/themes'),
-      exclude: options.exclude || ['base.less', 'default.less'],
-      namespace: options.namespace || 'themes',
+      entry: options.entry,
+      output: options.output || 'themes',
+      entryDir: options.entryDir || '',
     };
   }
 
   apply(compiler) {
     // 读取themeDir目录下文件
-    const { themeDir, exclude, namespace } = this.options;
-    const files = fs.readdirSync(themeDir);
+    const { entry, output, entryDir } = this.options;
     const entries = {};
 
-    files
-      .filter(file => !exclude.includes(file))
-      .forEach(file => {
-        const REGEXP_NAME = /(\w+)\.(less|scss|sass)/;
-        const match = file.match(REGEXP_NAME);
-        if (match) {
-          const [, name] = match;
-          entries[`${namespace}/${name}`] = path.resolve(themeDir, file);
-        }
-      });
+    Object.keys(entry).forEach(name => {
+      let entryPath = entry[name];
+      if (!path.isAbsolute(entryPath)) {
+        entryPath = path.resolve(entryDir, entryPath);
+      }
+
+      entries[`${output}/${name}`] = entryPath;
+    });
 
     // 添加新的entries
     compiler.hooks.entryOption.tap('ThemeConfigPlugin', context => {
@@ -56,17 +52,17 @@ class ThemeConfigPlugin {
       (compilation, callback) => {
         Object.keys(compilation.assets)
           .filter(asset => {
-            return new RegExp(`^${namespace}\\/(.+)\\.(js|css)$`).test(asset);
+            return new RegExp(`^${output}\\/(.+)\\.(js|css)$`).test(asset);
           })
           .forEach(asset => {
             const REGEXP_CSS_NAME = new RegExp(
-              `^${namespace}\\/(\\w+)(\\..+)?\\.css$`,
+              `^${output}\\/((?:\\w+(?:\\/)?)+)(\\..+)?\\.css$`,
             );
             const match = asset.match(REGEXP_CSS_NAME);
 
             if (match) {
               const [, name] = match;
-              compilation.assets[`${namespace}/${name}.css`] =
+              compilation.assets[`${output}/${name}.css`] =
                 compilation.assets[asset];
             }
 

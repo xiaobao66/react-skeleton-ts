@@ -365,7 +365,13 @@ module.exports = {
         : 'chunks/[id].[contenthash:8].css',
       ignoreOrder: true, // 去除css使用顺序冲突
     }),
-    new ThemeConfigPlugin(),
+    new ThemeConfigPlugin({
+      entry: {
+        yellow: './yellow.less',
+      },
+      output: 'themes',
+      entryDir: path.join(SRC_DIR, 'themes'),
+    }),
     ...(isAnalyze
       ? [new BundleAnalyzerPlugin(), new DuplicatePackageCheckerPlugin()]
       : []),
