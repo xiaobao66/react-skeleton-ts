@@ -6,7 +6,6 @@ const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const LessFunc = require('less-plugin-functions');
 // 分析构建结果
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
@@ -240,7 +239,7 @@ module.exports = {
                 options: {
                   sourceMap: true,
                   javascriptEnabled: true,
-                  plugins: [new LessFunc()],
+                  plugins: [new (require('less-plugin-functions'))()],
                 },
               },
             ],
