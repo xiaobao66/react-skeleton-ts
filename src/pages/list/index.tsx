@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './index.scss?local';
 
 type ItemProps = {
   id: number;
@@ -11,7 +12,7 @@ type Props = {
 
 function List({ items }: Props): JSX.Element {
   return (
-    <ul>
+    <ul className={styles.list}>
       {items.map(item => {
         return <li key={item.id}>{item.name}</li>;
       })}
