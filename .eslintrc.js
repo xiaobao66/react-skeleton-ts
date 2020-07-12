@@ -1,14 +1,13 @@
 module.exports = {
   root: true,
 
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
 
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 2018,
     ecmaFeatures: {
       jsx: true,
-      experimentalObjectRestSpread: true,
     },
   },
 
@@ -26,6 +25,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:prettier/recommended',
     'prettier/react',
+    'plugin:@typescript-eslint/recommended',
   ],
 
   plugins: [
@@ -73,7 +73,7 @@ module.exports = {
         aspects: ['noHref', 'invalidHref', 'preferButton'],
       },
     ],
-    'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx'] }],
+    'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
     'react/prefer-stateless-function': 'off',
     'react/forbid-prop-types': 'off',
     'react/destructuring-assignment': 'off',

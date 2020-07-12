@@ -6,6 +6,7 @@ const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 // 分析构建结果
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
@@ -118,7 +119,7 @@ module.exports = {
 
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts,', '.tsx', '.js', '.jsx'],
     alias,
   },
 
@@ -151,7 +152,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(tsx?|jsx?)$/,
         include: [SRC_DIR],
         use: [
           ...(isDebug
@@ -364,6 +365,12 @@ module.exports = {
         ? 'chunks/[id].css'
         : 'chunks/[id].[contenthash:8].css',
       ignoreOrder: true, // 去除css使用顺序冲突
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      eslint: {
+        enable: true,
+        files: './src/**/*.{ts,tsx}',
+      },
     }),
     new ThemeConfigPlugin({
       entry: {

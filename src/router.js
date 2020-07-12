@@ -45,6 +45,10 @@ const Routers = ({ history, app }) => {
       path: '/',
       component: () => import('pages/index'),
     },
+    {
+      path: '/list',
+      component: () => import('pages/list'),
+    },
   ];
 
   return (

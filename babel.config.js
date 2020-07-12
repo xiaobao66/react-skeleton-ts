@@ -19,6 +19,7 @@ module.exports = api => {
           corejs: { version: 3, proposals: false },
         },
       ],
+      '@babel/preset-typescript',
       ['@babel/preset-react', { development: isDebug }],
     ],
     plugins: [
