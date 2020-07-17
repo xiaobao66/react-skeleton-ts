@@ -78,6 +78,7 @@ module.exports = {
     'react/forbid-prop-types': 'off',
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
   },
 
   settings: {

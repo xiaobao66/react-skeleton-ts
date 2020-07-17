@@ -104,7 +104,7 @@ module.exports = {
             'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=10000&reload=true',
           ]
         : []),
-      './src/index.js',
+      './src/index.ts',
     ],
   },
 

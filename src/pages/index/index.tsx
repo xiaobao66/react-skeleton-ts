@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import logoImg from 'assets/images/index/react.svg';
 import styles from './index.scss?local';
 
-function Index() {
+function Index(): JSX.Element {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
