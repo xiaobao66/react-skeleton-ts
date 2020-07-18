@@ -1,6 +1,8 @@
 import qs from 'qs';
 import modelExtend from 'dva-model-extend';
 import { model } from 'models/common';
+import { SubscriptionAPI } from 'dva';
+import { Location } from 'history';
 
 export default modelExtend(model, {
   namespace: 'app',
@@ -9,8 +11,8 @@ export default modelExtend(model, {
     locationQuery: {},
   },
   subscriptions: {
-    setupHistory({ dispatch, history }) {
-      return history.listen(location => {
+    setupHistory({ dispatch, history }: SubscriptionAPI) {
+      return history.listen((location: Location) => {
         dispatch({
           type: 'updateState',
           payload: {

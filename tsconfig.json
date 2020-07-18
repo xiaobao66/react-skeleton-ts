@@ -11,13 +11,14 @@
     "importsNotUsedAsValues": "preserve",
     "target": "es2018",
     "module": "esnext",
-    "strict": true,
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
       "dva-loading": ["src/types/dva-loading"],
       "dva/dynamic": ["src/types/dva/dynamic"],
-      "pages/*": ["src/pages/*"]
+      "dva-model-extend": ["src/types/dva-model-extend"],
+      "pages/*": ["src/pages/*"],
+      "models/*": ["src/models/*"]
     }
   },
   "include": [

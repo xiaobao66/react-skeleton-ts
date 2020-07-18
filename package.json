@@ -14,7 +14,8 @@
     "dev:release": "npm run dev -- --release",
     "build": "cross-env NODE_ENV=production webpack --config  webpack/webpack.config.js --release",
     "build:analyze": "npm run build -- --analyze",
-    "dll": "webpack --config webpack/webpack.dll.config.js --mode development"
+    "dll": "webpack --config webpack/webpack.dll.config.js --mode development",
+    "eslint": "eslint --ext .ts --ext .tsx src -c .eslintrc.js --ignore-pattern node_modules"
   },
   "author": "xiaobaowei",
   "license": "ISC",
@@ -83,6 +84,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.2",
+    "@types/qs": "^6.9.3",
     "antd": "^3.26.8",
     "core-js": "^3.4.5",
     "dva": "^2.4.1",

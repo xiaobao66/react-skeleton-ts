@@ -1,6 +1,8 @@
 import dva from 'dva';
 import createLoading from 'dva-loading';
 import { createBrowserHistory } from 'history';
+import appModel from 'models/app';
+import router from './router';
 
 // 拦截未处理的rejection
 window.addEventListener('unhandledrejection', event => {
@@ -19,10 +21,10 @@ const app = dva({
 app.use(createLoading());
 
 // 3. Modal
-app.model(require('./models/app').default);
+app.model(appModel);
 
 // 4. Router
-app.router(require('./router').default);
+app.router(router);
 
 // 5. Start
 app.start('#root');

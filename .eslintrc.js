@@ -80,6 +80,15 @@ module.exports = {
     'react/require-default-props': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': ['error', {
+      allowArgumentsExplicitlyTypedAsAny: true,
+    }],
+    'import/extensions': ['error', 'ignorePackages', {
+      js: 'never',
+      jsx: 'never',
+      ts: 'never',
+      tsx: 'never',
+    }],
   },
 
   settings: {
@@ -87,6 +96,7 @@ module.exports = {
     // https://github.com/benmosher/eslint-plugin-import/tree/master/resolvers
     'import/resolver': {
       node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
         moduleDirectory: ['node_modules', 'src'],
       },
     },

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Switch, Route, routerRedux } from 'dva/router';
+import { Router, RouterAPI } from 'dva';
 import dynamic from 'dva/dynamic';
 import 'themes/default.less';
 import 'assets/styles/index.scss';
 
 const { ConnectedRouter } = routerRedux;
 
-const Routers = ({ history, app }: { history: any; app: any }): JSX.Element => {
+const Routers: Router = ({ history, app }: RouterAPI): JSX.Element => {
   const renderRoutes = (routes: any[], parentPath = ''): any[] => {
     return routes.reduce(
       (accumulator, { path, childRoutes, component, models }) => {
