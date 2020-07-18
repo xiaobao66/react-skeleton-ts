@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Switch, Route, routerRedux } from 'dva/router';
 import dynamic from 'dva/dynamic';
 import 'themes/default.less';
@@ -7,8 +6,8 @@ import 'assets/styles/index.scss';
 
 const { ConnectedRouter } = routerRedux;
 
-const Routers = ({ history, app }) => {
-  const renderRoutes = (routes, parentPath = '') => {
+const Routers = ({ history, app }: { history: any; app: any }): JSX.Element => {
+  const renderRoutes = (routes: any[], parentPath = ''): any[] => {
     return routes.reduce(
       (accumulator, { path, childRoutes, component, models }) => {
         const compiledPath = `${parentPath}${path}`;
@@ -59,11 +58,6 @@ const Routers = ({ history, app }) => {
       </Switch>
     </ConnectedRouter>
   );
-};
-
-Routers.propTypes = {
-  history: PropTypes.object,
-  app: PropTypes.object,
 };
 
 export default Routers;

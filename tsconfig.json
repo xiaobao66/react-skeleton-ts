@@ -10,12 +10,14 @@
     "noImplicitAny": true,
     "importsNotUsedAsValues": "preserve",
     "target": "es2018",
-    "module": "es2015",
+    "module": "esnext",
     "strict": true,
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
-      "dva-loading": ["src/types/dva-loading"]
+      "dva-loading": ["src/types/dva-loading"],
+      "dva/dynamic": ["src/types/dva/dynamic"],
+      "pages/*": ["src/pages/*"]
     }
   },
   "include": [

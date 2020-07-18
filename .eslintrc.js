@@ -79,6 +79,7 @@ module.exports = {
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 
   settings: {

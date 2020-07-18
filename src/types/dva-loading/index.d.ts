@@ -1,5 +1,3 @@
-import { func } from 'prop-types';
-
 export interface DvaLoadingState {
   global: boolean;
   models: { [type: string]: boolean | undefined };
