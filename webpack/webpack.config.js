@@ -56,6 +56,7 @@ const alias = {
   assets: path.join(SRC_DIR, 'assets'),
   themes: path.join(SRC_DIR, 'themes'),
   store: path.join(SRC_DIR, 'store'),
+  'react-dom': '@hot-loader/react-dom',
 };
 
 const staticAssetName = isDebug
@@ -104,6 +105,7 @@ module.exports = {
             'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=10000&reload=true',
           ]
         : []),
+      'react-hot-loader/patch',
       './src/index.js',
     ],
   },
