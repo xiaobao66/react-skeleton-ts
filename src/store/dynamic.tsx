@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useImported } from 'react-imported-component';
+import { StoreType } from './createStore';
+
+interface ArgsType {
+  store: StoreType;
+  component: () => any;
+  models: () => any[];
+}
 
 function Loading() {
   const [loading, setLoading] = useState(false);
@@ -17,7 +24,11 @@ function Loading() {
   return loading && <div>加载中...</div>;
 }
 
-export default function({ store, component, models: m = () => [] }) {
+export default function({
+  store,
+  component,
+  models: m = () => [],
+}: ArgsType): any {
   const loader = () => {
     return Promise.all([component(), ...m()]).then(([c, ...models]) => {
       if (models.length > 0) {

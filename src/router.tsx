@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { hot } from 'react-hot-loader/root';
@@ -8,7 +7,14 @@ import store from 'store/store';
 import 'themes/default.less';
 import 'assets/styles/index.scss';
 
-function renderRoutes(routes, parentPath = '') {
+interface RouteType {
+  path: string;
+  component: () => any;
+  models?: () => any[];
+  childRoutes?: RouteType[];
+}
+
+function renderRoutes(routes: RouteType[], parentPath = ''): any[] {
   return routes.reduce((memo, { path, childRoutes, component, models }) => {
     const compilePath = parentPath ? `${parentPath}/${path}` : path;
     let childComponents = [];

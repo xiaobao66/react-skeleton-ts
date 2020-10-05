@@ -14,16 +14,11 @@
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
-      "dva-loading": ["src/types/dva-loading"],
-      "dva/dynamic": ["src/types/dva/dynamic"],
-      "dva-model-extend": ["src/types/dva-model-extend"],
       "pages/*": ["src/pages/*"],
-      "models/*": ["src/models/*"]
+      "models/*": ["src/models/*"],
+      "store/*": ["src/store/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
   "exclude": [
     "node_modules"
   ],

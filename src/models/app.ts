@@ -1,6 +1,10 @@
 import modelExtend from 'store/modelExtend';
 import { model } from 'models/common';
 
+export interface AppState {
+  user: Record<string, any>;
+}
+
 export default modelExtend(model, {
   namespace: 'app',
   state: {

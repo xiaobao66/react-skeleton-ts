@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+import { History } from 'history';
+import { AppState } from 'models/app';
 import styles from './index.scss?local';
 
-function Home({ history, dispatch }) {
+interface Props {
+  history: History;
+  dispatch: Dispatch;
+  app: AppState;
+}
+
+function Home({ history, dispatch }: Props) {
   const [loading, setLoading] = useState(false);
 
   const onLogin = async () => {
@@ -45,9 +53,4 @@ function Home({ history, dispatch }) {
   );
 }
 
-Home.propTypes = {
-  history: PropTypes.object,
-  dispatch: PropTypes.func,
-};
-
-export default connect(({ app }) => ({ app }))(Home);
+export default connect(({ app }: { app: AppState }) => ({ app }))(Home);

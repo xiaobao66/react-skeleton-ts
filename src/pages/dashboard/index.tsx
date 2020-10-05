@@ -1,10 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { AppState } from 'models/app';
 
-function Dashboard() {
-  const user = useSelector(state => state.app.user);
+interface AppModel {
+  app: AppState;
+}
+
+function Dashboard(): JSX.Element {
+  const user = useSelector((state: AppModel) => state.app.user);
 
   return (
     <div>{!user ? <Link to="/">请登录</Link> : <p>hello {user.name}</p>}</div>

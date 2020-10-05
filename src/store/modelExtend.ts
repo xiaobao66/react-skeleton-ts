@@ -1,5 +1,7 @@
-export default function(...models) {
-  const base = { state: {}, reducers: {}, effects: {} };
+import { ModelType } from './createModel';
+
+export default function(...models: Partial<ModelType>[]): ModelType {
+  const base: Partial<ModelType> = { state: {}, reducers: {}, effects: {} };
 
   const model = models.reduce((acc, extend) => {
     acc.namespace = extend.namespace;
@@ -17,5 +19,5 @@ export default function(...models) {
     return acc;
   }, base);
 
-  return model;
+  return <ModelType>model;
 }
