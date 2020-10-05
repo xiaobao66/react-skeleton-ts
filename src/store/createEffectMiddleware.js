@@ -23,7 +23,7 @@ export default models => {
           dispatch: ({ type: t, ...params }) => {
             if (t.split('/').length > 1) {
               return dispatch({
-                t,
+                type: t,
                 ...params,
               });
             }
