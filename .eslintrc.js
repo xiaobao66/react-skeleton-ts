@@ -65,6 +65,7 @@ module.exports = {
       },
     ],
     'global-require': 'off',
+    'no-underscore-dangle': 'off',
     'jsx-a11y/anchor-is-valid': [
       'error',
       {
@@ -78,6 +79,7 @@ module.exports = {
     'react/forbid-prop-types': 'off',
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
 
   settings: {

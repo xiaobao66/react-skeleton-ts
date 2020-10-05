@@ -1,23 +1,18 @@
-import qs from 'qs';
-import modelExtend from 'dva-model-extend';
+import modelExtend from 'store/modelExtend';
 import { model } from 'models/common';
 
 export default modelExtend(model, {
   namespace: 'app',
   state: {
-    locationPathname: '',
-    locationQuery: {},
+    user: null,
   },
-  subscriptions: {
-    setupHistory({ dispatch, history }) {
-      return history.listen(location => {
-        dispatch({
-          type: 'updateState',
-          payload: {
-            locationPathname: location.pathname,
-            locationQuery: qs.parse(location.search.slice(1)),
-          },
-        });
+  effects: {
+    async login({ payload }, { dispatch }) {
+      await new Promise(resolve => setTimeout(() => resolve(), 1000));
+
+      dispatch({
+        type: 'updateState',
+        payload,
       });
     },
   },
