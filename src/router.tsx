@@ -1,64 +1,66 @@
 import React from 'react';
-import { Switch, Route, routerRedux } from 'dva/router';
-import { Router, RouterAPI } from 'dva';
-import dynamic from 'dva/dynamic';
+import PropTypes from 'prop-types';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { hot } from 'react-hot-loader/root';
+import dynamic from 'store/dynamic';
+import store from 'store/store';
 import 'themes/default.less';
 import 'assets/styles/index.scss';
 
-const { ConnectedRouter } = routerRedux;
+function renderRoutes(routes, parentPath = '') {
+  return routes.reduce((memo, { path, childRoutes, component, models }) => {
+    const compilePath = parentPath ? `${parentPath}/${path}` : path;
+    let childComponents = [];
+    if (childRoutes && childRoutes.length > 0) {
+      childComponents = renderRoutes(childRoutes, compilePath);
+    }
 
-const Routers: Router = ({ history, app }: RouterAPI): JSX.Element => {
-  const renderRoutes = (routes: any[], parentPath = ''): any[] => {
-    return routes.reduce(
-      (accumulator, { path, childRoutes, component, models }) => {
-        const compiledPath = `${parentPath}${path}`;
-        const childRouteComponents = childRoutes
-          ? renderRoutes(childRoutes, compiledPath)
-          : [];
+    if (!component) {
+      return memo.concat(childComponents);
+    }
 
-        if (!component) {
-          return accumulator.concat(childRouteComponents);
-        }
-
-        return accumulator.concat(
-          <Route
-            key={compiledPath}
-            exact
-            path={compiledPath}
-            component={dynamic({
-              app,
-              component,
-              models,
-            })}
-          />,
-          childRouteComponents,
-        );
-      },
-      [],
+    return memo.concat(
+      <Route
+        key={compilePath}
+        path={compilePath}
+        exact
+        component={dynamic({
+          store,
+          component,
+          models,
+        })}
+      />,
+      ...childComponents,
     );
-  };
+  }, []);
+}
 
+const Routers = () => {
   const error = () => <div>404</div>;
 
-  const portalRoutes = [
+  const routes = [
     {
       path: '/',
-      component: () => import('pages/index'),
+      component: () => import('pages/home'),
     },
     {
-      path: '/list',
-      component: () => import('pages/list'),
+      path: '/dashboard',
+      component: () => import('pages/dashboard'),
+      models: () => [import('models/dashboard')],
     },
   ];
 
   return (
-    <ConnectedRouter history={history}>
-      <Switch>
-        {renderRoutes(portalRoutes)}
-        <Route component={error} />
-      </Switch>
-    </ConnectedRouter>
+    <Provider store={store}>
+      <Router>
+        <Switch>
+          {renderRoutes(routes)}
+          <Route component={error} />
+        </Switch>
+      </Router>
+    </Provider>
   );
 };
 
-export default Routers;
+export default hot(Routers);

@@ -19,7 +19,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 const SRC_DIR = resolvePath('src');
 const BUILD_DIR = resolvePath('build');
-const PUBLIC_DIR = resolvePath('public');
+const ASSETS_DIR = resolvePath('src/assets');
 const CONFIG_DIR = resolvePath('webpack');
 
 // utils
@@ -56,6 +56,8 @@ const alias = {
   pages: path.join(SRC_DIR, 'pages'),
   assets: path.join(SRC_DIR, 'assets'),
   themes: path.join(SRC_DIR, 'themes'),
+  store: path.join(SRC_DIR, 'store'),
+  'react-dom': '@hot-loader/react-dom',
 };
 
 const staticAssetName = isDebug
@@ -104,7 +106,8 @@ module.exports = {
             'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=10000&reload=true',
           ]
         : []),
-      './src/index.ts',
+      'react-hot-loader/patch',
+      './src/index.tsx',
     ],
   },
 
@@ -240,6 +243,7 @@ module.exports = {
                 options: {
                   sourceMap: true,
                   javascriptEnabled: true,
+                  plugins: [new (require('less-plugin-functions'))()],
                 },
               },
             ],
@@ -337,8 +341,9 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: PUBLIC_DIR,
-        to: 'public', // 相对于output
+        from: ASSETS_DIR,
+        to: 'assets', // 相对于output
+        ignore: ['styles/**'],
       },
     ]),
     new HtmlWebpackPlugin({
