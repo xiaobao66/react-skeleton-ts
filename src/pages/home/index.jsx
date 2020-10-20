@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import { connect } from 'react-redux';
-import styles from './index.scss?local';
+import styles from './index.less?local';
 
 function Home({ history, dispatch }) {
   const [loading, setLoading] = useState(false);

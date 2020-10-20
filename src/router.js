@@ -6,7 +6,7 @@ import { hot } from 'react-hot-loader/root';
 import dynamic from 'store/dynamic';
 import store from 'store/store';
 import 'themes/default.less';
-import 'assets/styles/index.scss';
+import 'assets/styles/index.less';
 
 function renderRoutes(routes, parentPath = '') {
   return routes.reduce((memo, { path, childRoutes, component, models }) => {
