@@ -205,8 +205,10 @@ module.exports = {
                 loader: 'less-loader',
                 options: {
                   sourceMap: true,
-                  javascriptEnabled: true,
-                  plugins: [new (require('less-plugin-functions'))()],
+                  lessOptions: {
+                    javascriptEnabled: true,
+                    plugins: [new (require('less-plugin-functions'))()],
+                  },
                 },
               },
             ],
