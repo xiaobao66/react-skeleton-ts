@@ -296,24 +296,28 @@ module.exports = {
     new webpack.DefinePlugin({
       __DEV__: isDebug,
     }),
-    new CopyWebpackPlugin([
-      {
-        from: ASSETS_DIR,
-        to: 'assets', // 相对于output
-        ignore: ['styles/**'],
-      },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: ASSETS_DIR,
+          to: 'assets', // 相对于output
+          globOptions: {
+            ignore: ['**/styles/**'],
+          },
+        },
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
       title: 'react-skeleton',
-      templateParameters: (compilation, assets, options) => {
-        // v3版本这样写，升级到v4版本就需要进行变更
+      templateParameters: (compilation, assets, assetTags, options) => {
         return {
           compilation,
           webpack: compilation.getStats().toJson(),
           webpackConfig: compilation.options,
           htmlWebpackPlugin: {
+            tags: assetTags,
             files: assets,
             options,
           },
@@ -350,12 +354,14 @@ module.exports = {
                     'dependencies.manifest.json',
                   )),
                 }),
-                new CopyWebpackPlugin([
-                  {
-                    from: resolvePath('node_modules/react-skeleton/dll'),
-                    to: 'dll', // 相对于output
-                  },
-                ]),
+                new CopyWebpackPlugin({
+                  patterns: [
+                    {
+                      from: resolvePath('node_modules/react-skeleton/dll'),
+                      to: 'dll', // 相对于output
+                    },
+                  ],
+                }),
                 new HtmlWebpackTagsPlugin({
                   // 将dll库文件插入到html中，需要放在HtmlWebpackTagsPlugin之后
                   append: false,
