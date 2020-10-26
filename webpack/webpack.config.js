@@ -191,8 +191,8 @@ module.exports = {
                 loader: 'postcss-loader',
                 options: {
                   sourceMap: true,
-                  config: {
-                    path: CONFIG_DIR,
+                  postcssOptions: {
+                    config: CONFIG_DIR,
                   },
                 },
               },
