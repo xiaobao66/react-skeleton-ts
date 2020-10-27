@@ -1,5 +1,5 @@
-const fs = require('fs');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
 class ThemeConfigPlugin {
@@ -9,6 +9,14 @@ class ThemeConfigPlugin {
       output: options.output || 'themes',
       entryDir: options.entryDir || '',
     };
+  }
+
+  filterChunks(chunks, excludedChunks) {
+    return chunks.filter(chunk => {
+      return excludedChunks.every(
+        excludedChunk => chunk.indexOf(excludedChunk) === -1,
+      );
+    });
   }
 
   apply(compiler) {
@@ -34,14 +42,16 @@ class ThemeConfigPlugin {
 
     // 删除html文件中由theme生成的引用
     compiler.hooks.compilation.tap('ThemeConfigPlugin', compilation => {
-      compilation.hooks.htmlWebpackPluginAlterChunks.tap(
+      HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tap(
         'ThemeConfigPlugin',
-        (chunks, { plugin }) => {
-          return plugin.filterChunks(
-            chunks,
-            plugin.options.chunks,
-            Object.keys(entries),
-          );
+        ({ assets }) => {
+          return {
+            assets: {
+              ...assets,
+              css: this.filterChunks(assets.css, Object.keys(entries)),
+              js: this.filterChunks(assets.js, Object.keys(entries)),
+            },
+          };
         },
       );
     });

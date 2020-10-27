@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader/root';
 import dynamic from 'store/dynamic';
 import store from 'store/store';
 import 'themes/default.less';
-import 'assets/styles/index.scss';
+import 'assets/styles/index.less';
 
 interface RouteType {
   path: string;

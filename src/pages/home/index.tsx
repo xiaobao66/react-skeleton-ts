@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { Button } from 'antd';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { History } from 'history';
+import { RouteComponentProps } from 'react-router-dom';
 import { AppState } from 'models/app';
-import styles from './index.scss?local';
+import styles from './index.less?local';
 
-interface Props {
-  history: History;
+interface Props extends RouteComponentProps {
   dispatch: Dispatch;
   app: AppState;
 }

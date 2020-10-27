@@ -1,5 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
@@ -10,8 +12,6 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 // 分析构建结果
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const DuplicatePackageCheckerPlugin = require('duplicate-package-checker-webpack-plugin');
-// 构建优化
-const threadLoader = require('thread-loader');
 // 主题配置
 const ThemeConfigPlugin = require('./plugins/ThemeConfigPlugin');
 
@@ -34,7 +34,7 @@ function recursiveIssuer(m) {
 }
 
 // 获取命令行参数
-const { argv } = require('yargs')
+const { argv } = yargs(hideBin(process.argv))
   .boolean('release')
   .boolean('analyze')
   .boolean('verbose')
@@ -65,32 +65,6 @@ const staticAssetName = isDebug
   : '[name].[hash:8].[ext]';
 const staticImagePath = 'images';
 const staticFontPath = 'fonts';
-
-// thread-loader
-let jsWorkerPool = {};
-let scssWorkerPool = {};
-if (!isDebug) {
-  const cpus = require('os').cpus().length;
-  let workers = Math.floor(cpus / 2);
-  if (workers <= 1) {
-    // workers数目不能过小
-    workers = cpus;
-  } else if (workers >= 4) {
-    // workers数目不宜过多，否则进程开销会抵消编译速度的提升
-    workers = 4;
-  }
-
-  jsWorkerPool = {
-    workers,
-  };
-  scssWorkerPool = {
-    workers,
-    workerParallelJobs: 2, // 限制sass-loader并发数，否则可能导致进程卡死 （https://medium.com/webpack/webpack-freelancing-log-book-week-15-30105e94ab51）
-  };
-
-  threadLoader.warmup(jsWorkerPool, ['babel-loader']);
-  threadLoader.warmup(scssWorkerPool, ['sass-loader']);
-}
 
 module.exports = {
   context: ROOT_DIR,
@@ -158,14 +132,6 @@ module.exports = {
         test: /\.(tsx?|jsx?)$/,
         include: [SRC_DIR],
         use: [
-          ...(isDebug
-            ? []
-            : [
-                {
-                  loader: 'thread-loader',
-                  options: jsWorkerPool,
-                },
-              ]),
           {
             loader: 'babel-loader',
             options: {
@@ -228,8 +194,8 @@ module.exports = {
                 loader: 'postcss-loader',
                 options: {
                   sourceMap: true,
-                  config: {
-                    path: CONFIG_DIR,
+                  postcssOptions: {
+                    config: CONFIG_DIR,
                   },
                 },
               },
@@ -242,8 +208,10 @@ module.exports = {
                 loader: 'less-loader',
                 options: {
                   sourceMap: true,
-                  javascriptEnabled: true,
-                  plugins: [new (require('less-plugin-functions'))()],
+                  lessOptions: {
+                    javascriptEnabled: true,
+                    plugins: [new (require('less-plugin-functions'))()],
+                  },
                 },
               },
             ],
@@ -254,14 +222,6 @@ module.exports = {
               {
                 loader: 'resolve-url-loader',
               },
-              ...(isDebug
-                ? []
-                : [
-                    {
-                      loader: 'thread-loader',
-                      options: scssWorkerPool,
-                    },
-                  ]),
               {
                 loader: 'sass-loader',
                 options: {
@@ -339,24 +299,28 @@ module.exports = {
     new webpack.DefinePlugin({
       __DEV__: isDebug,
     }),
-    new CopyWebpackPlugin([
-      {
-        from: ASSETS_DIR,
-        to: 'assets', // 相对于output
-        ignore: ['styles/**'],
-      },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: ASSETS_DIR,
+          to: 'assets', // 相对于output
+          globOptions: {
+            ignore: ['**/styles/**'],
+          },
+        },
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(SRC_DIR, 'index.ejs'),
       filename: 'index.html',
       title: 'react-skeleton',
-      templateParameters: (compilation, assets, options) => {
-        // v3版本这样写，升级到v4版本就需要进行变更
+      templateParameters: (compilation, assets, assetTags, options) => {
         return {
           compilation,
           webpack: compilation.getStats().toJson(),
           webpackConfig: compilation.options,
           htmlWebpackPlugin: {
+            tags: assetTags,
             files: assets,
             options,
           },
@@ -399,12 +363,14 @@ module.exports = {
                     'dependencies.manifest.json',
                   )),
                 }),
-                new CopyWebpackPlugin([
-                  {
-                    from: resolvePath('node_modules/react-skeleton/dll'),
-                    to: 'dll', // 相对于output
-                  },
-                ]),
+                new CopyWebpackPlugin({
+                  patterns: [
+                    {
+                      from: resolvePath('node_modules/react-skeleton/dll'),
+                      to: 'dll', // 相对于output
+                    },
+                  ],
+                }),
                 new HtmlWebpackTagsPlugin({
                   // 将dll库文件插入到html中，需要放在HtmlWebpackTagsPlugin之后
                   append: false,
