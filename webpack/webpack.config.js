@@ -1,5 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
@@ -31,7 +33,7 @@ function recursiveIssuer(m) {
 }
 
 // 获取命令行参数
-const { argv } = require('yargs')
+const { argv } = yargs(hideBin(process.argv))
   .boolean('release')
   .boolean('analyze')
   .boolean('verbose')
