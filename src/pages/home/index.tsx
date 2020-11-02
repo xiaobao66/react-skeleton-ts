@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { Button } from 'antd';
+import { Button, Input, Form, message } from 'antd';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { RouteComponentProps } from 'react-router-dom';
 import { AppState } from 'models/app';
 import styles from './index.less?local';
 
-interface Props extends RouteComponentProps {
+const FormItem = Form.Item;
+
+interface IProps extends RouteComponentProps {
   dispatch: Dispatch;
   app: AppState;
 }
 
-function Home({ history, dispatch }: Props) {
+function Home({ history, dispatch }: IProps) {
   const [loading, setLoading] = useState(false);
+  const [username, setUserName] = useState('');
+  const [password, setPassword] = useState('');
 
   const onLogin = async () => {
     setLoading(true);
@@ -21,7 +25,8 @@ function Home({ history, dispatch }: Props) {
       await dispatch({
         type: 'app/login',
         payload: {
-          user: { name: 'xiaobaowei' },
+          username,
+          password,
         },
       });
 
@@ -30,6 +35,7 @@ function Home({ history, dispatch }: Props) {
       });
     } catch (e) {
       setLoading(false);
+      message.error({ content: e.message });
     }
   };
 
@@ -39,6 +45,23 @@ function Home({ history, dispatch }: Props) {
         <div className={styles.content}>
           <h1>React Skeleton</h1>
           <div>
+            <div>
+              <FormItem>
+                <Input
+                  placeholder="请输入用户名"
+                  value={username}
+                  onChange={e => setUserName(e.target.value)}
+                />
+              </FormItem>
+              <FormItem>
+                <Input
+                  type="password"
+                  placeholder="请输入密码"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </FormItem>
+            </div>
             <Button type="primary" loading={loading} onClick={onLogin}>
               登录
             </Button>

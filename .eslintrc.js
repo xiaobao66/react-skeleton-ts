@@ -66,6 +66,7 @@ module.exports = {
     ],
     'global-require': 'off',
     'no-underscore-dangle': 'off',
+    'prefer-promise-reject-errors': 'off',
     'jsx-a11y/anchor-is-valid': [
       'error',
       {
@@ -80,6 +81,7 @@ module.exports = {
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'react/no-unused-prop-types': 'warn',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-module-boundary-types': ['error', {

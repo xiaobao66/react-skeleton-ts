@@ -1,5 +1,6 @@
 import modelExtend from 'store/modelExtend';
 import { model } from 'models/common';
+import request from 'utils/request';
 
 export interface AppState {
   user: Record<string, any>;
@@ -12,11 +13,19 @@ export default modelExtend(model, {
   },
   effects: {
     async login({ payload }, { dispatch }) {
-      await new Promise(resolve => setTimeout(() => resolve(), 1000));
+      const {
+        data: { user },
+      } = await request({
+        url: '/api/user/login',
+        method: 'post',
+        data: payload,
+      });
 
       dispatch({
         type: 'updateState',
-        payload,
+        payload: {
+          user,
+        },
       });
     },
   },

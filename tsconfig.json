@@ -16,10 +16,11 @@
     "paths": {
       "pages/*": ["src/pages/*"],
       "models/*": ["src/models/*"],
-      "store/*": ["src/store/*"]
+      "store/*": ["src/store/*"],
+      "utils/*": ["src/utils/*"]
     }
   },
   "exclude": [
     "node_modules"
-  ],
+  ]
 }
