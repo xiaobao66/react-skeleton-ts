@@ -62,7 +62,7 @@
     "mini-css-extract-plugin": "^1.2.1",
     "mocker-api": "^2.7.0",
     "mockjs": "^1.1.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "pleeease-filters": "^4.0.0",
     "portfinder": "^1.0.28",
     "postcss-calc": "^7.0.5",
